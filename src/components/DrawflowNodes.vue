@@ -1,5 +1,18 @@
 <template>
+
   <v-row>
+    <v-col cols="12" v-if="alert">
+      <v-alert
+        dense
+        text
+        v-model="alert"
+        :type="typeError"
+        dismissible
+        style="margin-bottom: 0px;"
+      >
+        {{error}}
+      </v-alert>
+    </v-col>
     <v-col xs="12" sm="12" md="4" cols="12">
       <v-expansion-panels accordion v-model="panel" multiple>
         <v-expansion-panel>
@@ -29,10 +42,9 @@
             <v-btn color="cyan" @click="validateRoot" class="mr-2 mb-2">
               evaluate code
             </v-btn>
-            <v-btn color="success" @click="evaluarCodigo" class="mb-2">
+            <v-btn color="success" @click="executeCode" class="mb-2">
               run code
             </v-btn>
-            <v-btn @click="exportData">exportdata</v-btn>
           </v-expansion-panel-content>
         </v-expansion-panel>
         <v-expansion-panel>
@@ -155,7 +167,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close">
+          <v-btn color="blue darken-1" text @click="dialog = false">
             Cancel
           </v-btn>
           <v-btn color="blue darken-1" text @click="saveProgramConfirm">
@@ -172,7 +184,7 @@
         >
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeDelete"
+          <v-btn color="blue darken-1" text @click="dialogDelete = false"
             >Cancel</v-btn
           >
           <v-btn
@@ -202,10 +214,15 @@ import validations from "../helpers/validations";
 export default {
   data() {
     return {
+      alert: false,
+      error: "",
+      typeError: "error",
       panel: [0, 1, 2],
       valid: true,
       programName: "",
       editing: false,
+      uidEditing: "",
+      uidDeleting: "",
       dialog: false,
       dialogDelete: false,
       editor: null,
@@ -237,28 +254,17 @@ export default {
       return this.editing ? "Edit program":"New program";
     },
   },
-  watch: {
-    // dialog (val) {
-    //     val || this.close()
-    // },
-    // dialogDelete(val) {
-    //   val || this.closeDelete();
-    // },
-  },
   mounted() {
     const id = document.getElementById("drawflow");
     this.editor = new Drawflow(id, Vue, this);
     this.editor.start();
-    //this.createRootNode();
-    //this.createIfNode(400, 400);
-    //this.getProgramData()
     this.getPrograms();
   },
   methods: {
     async saveProgramConfirm() {
       this.valid = this.$refs.form.validate();
       if(this.valid){
-        console.log("saveConfirm");
+        
         var exportdata = this.editor.export();
         let data = JSON.parse(JSON.stringify(exportdata.drawflow.Home.data));
 
@@ -267,37 +273,75 @@ export default {
           values.push(data[i]);
         }
 
-        let program = { programName: this.programName, nodes: values, uid: "_:program" };
-        let res = await api.saveProgram(program)
-        if(res.status == 201){
-          this.editor.clear()
-          this.$refs.form.reset();
-          this.close();
-        }else{
-          console.log(res);
+        if(this.editing){//update program
+          let program = { programName: this.programName, nodes: values, uid: this.uidEditing};
+          let res = await api.updateProgram(this.uidEditing, program)
+          if(res.status == 204){
+            this.editing = false
+            this.uidEditing = ""
+            this.editor.clear()
+            this.editor.nodeId = 1
+            this.rootNodeId = 0
+            this.$refs.form.reset();
+            this.dialog = false
+            this.getPrograms()
+          }else{
+            this.showError(res.msg, "error")
+          }
+        }else{//create program
+          let program = { programName: this.programName, nodes: values, uid: "_:program" };
+          let res = await api.saveProgram(program)
+          if(res.status == 201){
+            this.editor.clear()
+            this.rootNodeId = 0
+            this.editor.nodeId = 1
+            this.$refs.form.reset();
+            this.dialog = false
+            this.getPrograms()
+          }else{
+            this.showError(res.msg, "error")
+          }
         }
-        
       }
     },
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {});
+    async deleteItemConfirm() {
+      let res = await api.deleteProgram(this.uidDeleting)
+      if(res.status == 204){
+        if(this.uidDeleting == this.uidEditing){
+          this.uidEditing = ""
+          this.editor.clear()
+          this.editor.nodeId = 1
+          this.rootNodeId = 0
+          this.$refs.form.reset();
+        }
+        
+        this.programs = this.programs.filter(p => p.uid !== this.uidDeleting)
+        this.uidDeleting = ""
+      }else{
+        this.showError(res.msg, "error")
+      }
+      this.dialogDelete = false
     },
-    editedItem(item) {
-      this.dialog = true;
-    },
-    deleteItemConfirm() {
-      this.closeDelete();
-    },
-    deleteItem(item) {
+    deleteItem(uid) {
+      this.uidDeleting = uid
       this.dialogDelete = true;
     },
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {});
+    async editItem(uid) {
+      let res = await api.getProgramsByUid(uid)
+      if(res.status == 200){
+        this.editor.clear()
+        this.programName = res.data.programName
+        this.editor.import(this.prepareDrawflowData(res.data.nodes))
+        this.editing = true
+        this.uidEditing = uid
+      }else{
+        this.showError(res.msg, "error")
+      }
     },
-    editItem(item) {
-      console.log(item);
+     showError(error, type){
+      this.error = error
+      this.typeError = type
+      this.alert = true
     },
     allowDrop(ev) {
       ev.preventDefault();
@@ -320,21 +364,15 @@ export default {
         this.editor.precanvas.clientHeight;
       this.addNodeToDrawFlow(data, pos_x, pos_y);
     },
-    async getProgramData() {
-      let program = await api.getProgramsByUid('0x5f');
-      console.log(program);
-      let nodes = program.nodes;
+    prepareDrawflowData(nodes) {
       let json = {};
       for (let i in nodes) {
         let node = nodes[i];
         if (node.name == "root") {
           this.rootNodeId = node.id;
         }
-        
         json[node.id.toString()] = node;
       }
-
-      console.log(json);
       let data = {
         drawflow: {
           Home: {
@@ -342,36 +380,15 @@ export default {
           },
         },
       };
-      //console.log(program);
-      this.editor.import(data);
-      console.log(data);
+      return data
     },
-    exportData() {
-      this.validateRoot();
-      // if (this.errors.length == 0) {
-        var exportdata = this.editor.export();
-        let data = JSON.parse(JSON.stringify(exportdata.drawflow.Home.data));
-
-        let values = [];
-        for (let i in data) {
-          // if (data[i].name == "root"){
-          //   let connections = data[i].inputs.input_1.connections
-          //   for (let i in connections) {
-          //     connections[i] = {...connections[i],"order":Number(i)+1}
-          //     console.log(connections[i]);
-          //   }
-          //   console.log(data[i].inputs.input_1.connections);
-          // }
-          values.push(data[i]);
+    async executeCode() {
+      let res = await executeCodeResponse(this.script);
+      if(res.status == 200){
+          this.validation = res.data;
+        }else{
+          console.log(res);
         }
-
-        let cc = { programName: "fff", nodes: values, uid: "_:program" };
-        console.log(cc);
-      // }
-    },
-    async evaluarCodigo() {
-      let pokemonArr = await executeCodeResponse(this.script);
-      this.validation = pokemonArr;
     },
     async getPrograms() {
       let {data} = await api.getPrograms()

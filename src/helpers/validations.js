@@ -25,10 +25,18 @@ export default {
             //validar inputs
             let inputs = node.inputs;
             if (inputs.input_1.connections.length !== 1) {
-                this.errors.push({
-                    error: operation + " node debe tener mas de 1 input conexión",
+                let connections = inputs.input_1.connections.length
+                if(connections == 0){
+                  this.errors.push({
+                    error: "[input_1] requires 1 connection.",
                     node: node.id,
-                });
+                   });
+                }else{
+                  this.errors.push({
+                    error: "[input_1] only one connection is allowed.",
+                    node: node.id,
+                  });
+                }
             } else {
                 let nodeInput = this.editor.getNodeFromId(
                     inputs.input_1.connections[0].node
@@ -38,17 +46,17 @@ export default {
                     this.script += nodeInput.data.num + operator;
                 } else {
                     this.errors.push({
-                        error: "El nodo " + nodeInput.name + " no es permitido.",
-                        node: nodeInput.id
+                        error: "[input_1] the " + nodeInput.name + " node is not allowed.",
+                        node: node.id
                     });
                 }
             }
         
             if (inputs.input_2.connections.length !== 1) {
-                this.errors.push({
-                    error: operation + " node debe tener mas de 1 input conexión",
-                    node: node.id
-                });
+                  this.errors.push({
+                    error: "[input_2] requires only 1 connection.",
+                    node: node.id,
+                   });
             } else {
                 let nodeInput = this.editor.getNodeFromId(
                     inputs.input_2.connections[0].node
@@ -58,7 +66,7 @@ export default {
                     this.script += nodeInput.data.num + "\n";
                 } else {
                     this.errors.push({
-                        error: "El nodo " + nodeInput.name + " no es permitido.",
+                        error: "[input_2] the " + nodeInput.name + " node is not allowed.",
                         node: node.id,
                     });
                 }
@@ -68,7 +76,7 @@ export default {
             //validar outputs
             if (outputs.output_1.connections.length !== 1) {
                 this.errors.push({
-                    error: operation + " node debe tener 1 output conexión",
+                    error: "[output_1] requires only 1 connection.",
                     node: node.id,
                 });
             } else {
@@ -76,14 +84,9 @@ export default {
                     outputs.output_1.connections[0].node
                 );
         
-                if (!(nodeInput.name === "for-body"  ||
-                      nodeInput.name === "if-body"   ||
-                      nodeInput.name === "else-body" ||
-                      nodeInput.name === "assign"    ||
-                      nodeInput.name === "root" )) {
-                        
+                if (!(nodeInput.name === "assign")) {
                     this.errors.push({
-                        error: "El nodo " + nodeInput.name + " no es permitido.",
+                        error: "[output_1] the " + nodeInput.name + " node is not allowed.",
                         node: node.id
                     });
                 }
@@ -95,7 +98,7 @@ export default {
             let input_connections = node.inputs.input_1.connections.length;
             if (input_connections !== 1) {
               this.errors.push({
-                error: "Assign node debe de tener una sola input conexión",
+                error: "[input_1] requires only 1 connection.",
                 node: node.id,
               });
             } else {
@@ -112,8 +115,8 @@ export default {
                 this.selectValidation(nodeInput,identation);
               } else {
                 this.errors.push({
-                  error: "El nodo " + nodeInput.name + " no es permitido.",
-                  node: nodeInput.id,
+                  error: "[input_1] the " + nodeInput.name + " node is not allowed.",
+                  node: node.id,
                 });
               }
             }
@@ -122,7 +125,7 @@ export default {
             //validar output
             if (outputs.output_1.connections.length !== 1) {
               this.errors.push({
-                error: "Assign node debe tener 1 output conexión",
+                error: "[output_1] requires only 1 connection.",
                 node: node.id,
               });
             } else {
@@ -136,42 +139,59 @@ export default {
                     nodeInput.name === "root" )) {
                       
                   this.errors.push({
-                      error: "El nodo " + nodeInput.name + " no es permitido.",
+                      error: "[output_1] the " + nodeInput.name + " node is not allowed.",
                       node: node.id,
                   });
               }
             }
           },
           validateIfNode(node, identation){
-            //validar inputs
-            //if condition
             this.script += this.returnIdentation(identation) + "if {condition}:\n";
+            //if condition input
             let input_connections = node.inputs.input_1.connections.length;
             if (input_connections !== 1) {
               this.errors.push({
-                error: "IF node debe de tener un solo if condition.",
+                error: "[input_1] requires only 1 connection to a node [IF CONDITION].",
                 node: node.id
               });
             } else {
-              let nodeIfCondition = this.editor.getNodeFromId(
+              let nodeInput = this.editor.getNodeFromId(
                 node.inputs.input_1.connections[0].node
               );
-              //input_1
-              if (nodeIfCondition.name === "if-condition") {
-                this.script = this.script.replace('{condition}', nodeIfCondition.data.con.trim())
+              if (nodeInput.name === "if-condition") {
+                //if condition output
+                let output_connections = nodeInput.outputs.output_1.connections.length;
+                if (output_connections !== 1) {
+                  this.errors.push({
+                    error: "[output_1] requires only 1 connection to a node [IF].",
+                    node: nodeInput.id
+                  });
+                } else {
+                  let nodeOutput = this.editor.getNodeFromId(
+                    nodeInput.outputs.output_1.connections[0].node
+                  );
+                  if (!(nodeOutput.name === "if")) {
+                    this.errors.push({
+                      error: "[output_1] the " + nodeOutput.name + " node is not allowed.",
+                      node: nodeInput.id
+                    });
+                  }
+                }
+
+                this.script = this.script.replace('{condition}', nodeInput.data.con.trim())
               } else {
                 this.errors.push({
-                  error: "IF node debe de tener un nodo if-condition.",
+                  error: "[input_1] the " + nodeInput.name + " node is not allowed.",
                   node: node.id
                 });
               }
             }
-        
-            //if body
+
+            //if body inputs
             input_connections = node.inputs.input_2.connections.length;
             if (input_connections !== 1) {
               this.errors.push({
-                error: "IF node debe de tener un solo if body",
+                error: "[input_2] requires only 1 connection to a node [IF BODY].",
                 node: node.id
               });
             } else {
@@ -180,6 +200,7 @@ export default {
                 node.inputs.input_2.connections[0].node
               );
               if (nodeIfBody.name === "if-body") {
+                //INPUTS
                 let input_connections = nodeIfBody.inputs.input_1.connections.length;
                 if (input_connections === 1) {
                   let nodeInput = this.editor.getNodeFromId(
@@ -194,29 +215,48 @@ export default {
                     this.selectValidation(nodeInput, identation+1);
                   } else {
                     this.errors.push({
-                      error: "El nodo " + nodeInput.name + " no es permitido.",
+                      error: "[input_1] the " + nodeInput.name + " node is not allowed.",
                       node: nodeIfBody.id
                     });
                   }
                 } else {
                   this.errors.push({
-                    error: "IF body debe de tener un solo input connection",
+                    error: "[input_1] requires only 1 connection.",
                     node: nodeIfBody.id
                   });
                 }
+
+                //OUTPUTS
+                let output_connections = nodeIfBody.outputs.output_1.connections.length;
+                if (output_connections !== 1) {
+                  this.errors.push({
+                    error: "[output_1] requires only 1 connection to a node [IF].",
+                    node: nodeIfBody.id
+                  });
+                } else {
+                  let nodeOutput = this.editor.getNodeFromId(
+                    nodeIfBody.outputs.output_1.connections[0].node
+                  );
+                  if (!(nodeOutput.name === "if")) {
+                    this.errors.push({
+                      error: "[output_1] the " + nodeOutput.name + " node is not allowed.",
+                      node: nodeIfBody.id
+                    });
+                  }
+                }
               } else {
                 this.errors.push({
-                  error: "IF node debe de tener un nodo if-body.",
+                  error: "[input_2] the " + nodeIfBody.name + " node is not allowed.",
                   node: node.id
                 });
               }
             }
         
-            //else body
+            //else body input
             input_connections = node.inputs.input_3.connections.length;
             if (input_connections > 1) {
               this.errors.push({
-                error: "IF node debe de tener un solo else body o ninguno",
+                error: "[input_3] does not require a connection but if it is included only 1 connection is allowed with a node [ElSE BODY].",
                 node: node.id
               });
             } else if (input_connections === 1) {
@@ -226,6 +266,7 @@ export default {
               );
               if (nodeElseBody.name === "else-body") {
                 this.script += this.returnIdentation(identation) + "else:\n";
+                //INPUTS
                 let input_connections =
                   nodeElseBody.inputs.input_1.connections.length;
                 if (input_connections === 1) {
@@ -238,33 +279,53 @@ export default {
                     nodeInput.name === "if" ||
                     nodeInput.name === "print"
                   ) {
-                    console.log("else");
                     this.selectValidation(nodeInput,identation+1);
                   } else {
                     this.errors.push({
-                      error: "El nodo " + nodeInput.name + " no es permitido.",
+                      error: "[input_1] the " + nodeInput.name + " node is not allowed.",
                       node: nodeElseBody.id
                     });
                   }
                 } else {
                   this.errors.push({
-                    error: "Else body debe de tener un solo input connection",
+                    error: "[input_1] requires only 1 connection.",
                     node: nodeElseBody.id
                   });
                 }
+
+                //OUTPUTS
+                let output_connections = nodeElseBody.outputs.output_1.connections.length;
+                if (output_connections !== 1) {
+                  this.errors.push({
+                    error: "[output_1] requires only 1 connection to a node [IF].",
+                    node: nodeElseBody.id
+                  });
+                } else {
+                  let nodeOutput = this.editor.getNodeFromId(
+                    nodeElseBody.outputs.output_1.connections[0].node
+                  );
+                  if (!(nodeOutput.name === "if")) {
+                    this.errors.push({
+                      error: "[output_1] the " + nodeOutput.name + " node is not allowed.",
+                      node: nodeElseBody.id
+                    });
+                  }
+                }
+
               } else {
                 this.errors.push({
-                  error: "IF node debe de tener un nodo else-body.",
+                  error: "[input_3] the " + nodeElseBody.name + " node is not allowed.",
                   node: node.id
                 });
               }
             }
-        
+            
+            //if output
             let outputs = node.outputs;
             //validar outputs
             if (outputs.output_1.connections.length !== 1) {
               this.errors.push({
-                error: "If node debe tener 1 output conexión",
+                error: "[output_1] requires only 1 connection.",
                 node: node.id
               });
             } else {
@@ -277,15 +338,41 @@ export default {
                     nodeInput.name === "else-body" ||
                     nodeInput.name === "for-body")) {
                   this.errors.push({
-                      error: "El nodo " + nodeInput.name + " no es permitido.",
+                      error: "[output_1] the " + nodeInput.name + " node is not allowed.",
                       node: node.id
                   });
               }
             }
           },
           validatePrintNode(node, identation){
-            console.log("print");
-            this.script += this.returnIdentation(identation) + 'print("' + node.data.msg + '")\n';
+            let output_connections = node.outputs.output_1.connections.length;
+            if (output_connections !== 1) {
+              this.errors.push({
+                error: "[output_1] requires only 1 connection.",
+                node: node.id
+              });
+            } else {
+              let nodeInput = this.editor.getNodeFromId(
+                node.outputs.output_1.connections[0].node
+              );
+              //output_1
+              if (nodeInput.name === "if-body" || 
+                  nodeInput.name === "else-body" ||
+                  nodeInput.name === "for-body" ||
+                  nodeInput.name === "root") {
+                    let c= node.data.msg
+                    if(c.substring(0,1) == "{" && c.substring(c.length - 1) == "}"){
+                      this.script += this.returnIdentation(identation) + `print(${c.substring(1,c.length-1)})\n`;
+                    }else{
+                      this.script += this.returnIdentation(identation) + "print('"+c+"')\n";
+                    }
+              } else {
+                this.errors.push({
+                  error: "[output_1] the " + nodeInput.name + " node is not allowed.",
+                  node: node.id
+                });
+              }
+            }
         },
         validateForNode(node, identation){
             //validar inputs
@@ -293,7 +380,7 @@ export default {
             let input_connections = node.inputs.input_1.connections.length;
             if (input_connections !== 1) {
               this.errors.push({
-                error: "For node debe de tener un solo range node.",
+                error: "[input_1] requires only 1 connection to a node [RANGE].",
                 node: node.id
               });
             } else {
@@ -304,11 +391,11 @@ export default {
               if (nodeRange.name === "range") {
                 let start = 0;
                 let end = 0;
-                //validar inputs
+                //INPUTS
                 let inputs = nodeRange.inputs;
                 if (inputs.input_1.connections.length !== 1) {
                   this.errors.push({
-                    error: "Range node debe tener solo 1 input conexión",
+                    error: "[input_1] requires only 1 connection to a node [NUMBER].",
                     node: nodeRange.id
                   });
                 } else {
@@ -319,7 +406,7 @@ export default {
                     start = nodeInput.data.num;
                   } else {
                     this.errors.push({
-                      error: "El nodo " + nodeInput.name + " no es permitido.",
+                      error: "[input_1] the " + nodeInput.name + " node is not allowed.",
                       node: nodeInput.id
                     });
                   }
@@ -327,7 +414,7 @@ export default {
         
                 if (inputs.input_2.connections.length !== 1) {
                   this.errors.push({
-                    error: "Range node debe tener solo 1 input conexión",
+                    error: "[input_2] requires only 1 connection to a node [NUMBER].",
                     node: nodeRange.id
                   });
                 } else {
@@ -338,15 +425,34 @@ export default {
                     end = nodeInput.data.num;
                   } else {
                     this.errors.push({
-                      error: "El nodo " + nodeInput.name + " no es permitido.",
+                      error: "[input_2] the " + nodeInput.name + " node is not allowed.",
                       node: nodeInput.id
                     });
                   }
                 }
+                //OUTPUTS
+                let outputs = nodeRange.outputs;
+                if (outputs.output_1.connections.length !== 1) {
+                  this.errors.push({
+                    error: "[output_1] requires only 1 connection to a node [FOR].",
+                    node: nodeRange.id
+                  });
+                } else {
+                  let nodeInput = this.editor.getNodeFromId(
+                    outputs.output_1.connections[0].node
+                  );
+                  if (!(nodeInput.name === "for")) {
+                    this.errors.push({
+                      error: "[output_1] the " + nodeInput.name + " node is not allowed.",
+                      node: nodeRange.id
+                    });
+                  }
+                }
+
                 this.script += this.returnIdentation(identation) + "for i in range(" + start + "," + end + "):\n";
               } else {
                 this.errors.push({
-                  error: "Range node debe de tener un nodo range.",
+                  error: "[input_1] the " + nodeRange.name + " node is not allowed.",
                   node: node.id
                 });
               }
@@ -356,7 +462,7 @@ export default {
             input_connections = node.inputs.input_2.connections.length;
             if (input_connections !== 1) {
               this.errors.push({
-                error: "For node debe de tener un solo for body",
+                error: "[input_2] requires only 1 connection to a node [FOR BODY].",
                 node: node.id
               });
             } else {
@@ -365,6 +471,7 @@ export default {
                 node.inputs.input_2.connections[0].node
               );
               if (nodeForBody.name === "for-body") {
+                //INPUTS
                 let input_connections = nodeForBody.inputs.input_1.connections.length;
                 if (input_connections === 1) {
                   let nodeInput = this.editor.getNodeFromId(
@@ -379,19 +486,38 @@ export default {
                     this.selectValidation(nodeInput, identation+1);
                   } else {
                     this.errors.push({
-                      error: "El nodo " + nodeInput.name + " no es permitido.",
+                      error: "[input_1] the " + nodeInput.name + " node is not allowed.",
                       node: nodeForBody.id
                     });
                   }
                 } else {
                   this.errors.push({
-                    error: "For body debe de tener un solo input connection",
+                    error: "[input_1] requires only 1 connection.",
                     node: nodeForBody.id
                   });
                 }
+                //OUTPUTS
+                let output_connections = nodeForBody.outputs.output_1.connections.length;
+                if (output_connections === 1) {
+                  let nodeInput = this.editor.getNodeFromId(
+                    nodeForBody.outputs.output_1.connections[0].node
+                  );
+                  if (!(nodeInput.name === "for")) {
+                    this.errors.push({
+                      error: "[output_1] the " + nodeInput.name + " node is not allowed.",
+                      node: nodeForBody.id
+                    });
+                  }
+                } else {
+                  this.errors.push({
+                    error: "[output_1] requires only 1 connection to a node [FOR].",
+                    node: nodeForBody.id
+                  });
+                }
+
               } else {
                 this.errors.push({
-                  error: "For node debe de tener un nodo for-body.",
+                  error: "[input_2] the " + nodeForBody.name + " node is not allowed.",
                   node: node.id
                 });
               }
@@ -401,7 +527,7 @@ export default {
             //validar outputs
             if (outputs.output_1.connections.length !== 1) {
               this.errors.push({
-                error: "For node debe tener 1 output conexión",
+                error: "[output_1] requires only 1 connection.",
                 node: node.id
               });
             } else {
@@ -414,7 +540,7 @@ export default {
                     nodeInput.name === "else-body" ||
                     nodeInput.name === "for-body")) {
                   this.errors.push({
-                      error: "El nodo " + nodeInput.name + " no es permitido.",
+                      error: "[output_1] the " + nodeInput.name + " node is not allowed.",
                       node: node.id
                   });
               }
@@ -433,7 +559,7 @@ export default {
                 this.selectValidation(node, 0);
               });
             } else {
-              this.errors.push({ error: "Debe agregar un root  node", node: 1 });
+              this.showError('You must add a root node.', "error")
             }
           },
           selectValidation(node, identation){

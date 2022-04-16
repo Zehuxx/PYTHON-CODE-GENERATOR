@@ -3,7 +3,7 @@ export default {
 		createAddNode(pos_x, pos_y) {
 			var html = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Number</div>
 							<div class="item">
@@ -12,12 +12,9 @@ export default {
 						</div>`;
 			var html2 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Add</div>
-							<div class="item">
-								<input type="text" style="width:100%;background-color: white !important;" df-num>
-							</div>
 						</div>`;
 
 			let id1 = this.editor.addNode(
@@ -30,7 +27,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id1,{nid:"Node id: "+id1,num: "0"})
+			this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1,num: "0"})
 
 			let id2 = this.editor.addNode(
 				"number",
@@ -42,7 +39,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id2,{nid:"Node id: "+id2,num: "0"})
+			this.editor.updateNodeDataFromId(id2,{nid:"id: "+id2,num: "0"})
 
 			let id3 = this.editor.addNode(
 				"add",
@@ -54,7 +51,7 @@ export default {
 				{},
 				html2
 			);
-			this.editor.updateNodeDataFromId(id3,{nid:"Node id: "+id3,num: "0"})
+			this.editor.updateNodeDataFromId(id3,{nid:"id: "+id3})
 
 			//addConnection(id_output, id_input, output_class, input_class)
 			this.editor.addConnection(id1, id3, "output_1", "input_1");
@@ -63,7 +60,7 @@ export default {
 		createSubNode(pos_x, pos_y) {
 			var html = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Number</div>
 							<div class="item">
@@ -72,12 +69,9 @@ export default {
 						</div>`;
 			var html2 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Sub</div>
-							<div class="item">
-								<input type="text" style="width:100%;background-color: white !important;" df-num>
-							</div>
 						</div>`;
 
 			//this.editor.addNode(name, inputs, outputs, posx, posy, class, data, html);
@@ -91,7 +85,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id1,{nid:"Node id: "+id1,num: "0"})
+			this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1,num: "0"})
 
 			let id2 = this.editor.addNode(
 				"number",
@@ -103,7 +97,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id2,{nid:"Node id: "+id2,num: "0"})
+			this.editor.updateNodeDataFromId(id2,{nid:"id: "+id2,num: "0"})
 
 			let id3 = this.editor.addNode(
 				"sub",
@@ -115,7 +109,7 @@ export default {
 				{},
 				html2
 			);
-			this.editor.updateNodeDataFromId(id3,{nid:"Node id: "+id3,num: "0"})
+			this.editor.updateNodeDataFromId(id3,{nid:"id: "+id3})
 
 			//addConnection(id_output, id_input, output_class, input_class)
 			this.editor.addConnection(id1, id3, "output_1", "input_1");
@@ -124,7 +118,7 @@ export default {
 		createDivNode(pos_x, pos_y) {
 			var html = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Number</div>
 							<div class="item">
@@ -133,12 +127,9 @@ export default {
 						</div>`;
 			var html2 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Div</div>
-							<div class="item">
-								<input type="text" style="width:100%;background-color: white !important;" df-num>
-							</div>
 						</div>`;
 
 			//this.editor.addNode(name, inputs, outputs, posx, posy, class, data, html);
@@ -152,7 +143,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id1,{nid:"Node id: "+id1,num: "0"})
+			this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1,num: "0"})
 
 			let id2 = this.editor.addNode(
 				"number",
@@ -164,7 +155,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id2,{nid:"Node id: "+id2,num: "0"})
+			this.editor.updateNodeDataFromId(id2,{nid:"id: "+id2,num: "0"})
 
 			let id3 = this.editor.addNode(
 				"div",
@@ -176,7 +167,7 @@ export default {
 				{},
 				html2
 			);
-			this.editor.updateNodeDataFromId(id3,{nid:"Node id: "+id3,num: "0"})
+			this.editor.updateNodeDataFromId(id3,{nid:"id: "+id3})
 
 			//addConnection(id_output, id_input, output_class, input_class)
 			this.editor.addConnection(id1, id3, "output_1", "input_1");
@@ -185,7 +176,7 @@ export default {
 		createMulNode(pos_x, pos_y) {
 			var html = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Number</div>
 							<div class="item">
@@ -194,12 +185,9 @@ export default {
 						</div>`;
 			var html2 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Mul</div>
-							<div class="item">
-								<input type="text" style="width:100%;background-color: white !important;" df-num>
-							</div>
 						</div>`;
 
 			//this.editor.addNode(name, inputs, outputs, posx, posy, class, data, html);
@@ -213,7 +201,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id1,{nid:"Node id: "+id1,num: "0"})
+			this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1,num: "0"})
 
 			let id2 = this.editor.addNode(
 				"number",
@@ -225,7 +213,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id2,{nid:"Node id: "+id2,num: "0"})
+			this.editor.updateNodeDataFromId(id2,{nid:"id: "+id2,num: "0"})
 
 			let id3 = this.editor.addNode(
 				"mul",
@@ -237,7 +225,7 @@ export default {
 				{},
 				html2
 			);
-			this.editor.updateNodeDataFromId(id3,{nid:"Node id: "+id3,num: "0"})
+			this.editor.updateNodeDataFromId(id3,{nid:"id: "+id3})
 
 			//addConnection(id_output, id_input, output_class, input_class)
 			this.editor.addConnection(id1, id3, "output_1", "input_1");
@@ -246,14 +234,14 @@ export default {
 		createIfNode(pos_x, pos_y) {
 			var html = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">If</div>
 						</div>`;
 
 			var html2 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">If condition</div>
 							<div class="item">
@@ -263,14 +251,14 @@ export default {
 
 			var html3 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">If body</div>
 						</div>`;
 
 			var html4 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Else body</div>
 						</div>`;
@@ -286,7 +274,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id1,{nid:"Node id: "+id1})
+			this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1})
 
 			let id2 = this.editor.addNode(
 				"if-condition",
@@ -298,7 +286,7 @@ export default {
 				{},
 				html2
 			);
-			this.editor.updateNodeDataFromId(id2,{nid:"Node id: "+id2, con:""})
+			this.editor.updateNodeDataFromId(id2,{nid:"id: "+id2, con:""})
 
 			let id3 = this.editor.addNode(
 				"if-body",
@@ -310,7 +298,7 @@ export default {
 				{},
 				html3
 			);
-			this.editor.updateNodeDataFromId(id3,{nid:"Node id: "+id3})
+			this.editor.updateNodeDataFromId(id3,{nid:"id: "+id3})
 
 			let id4 = this.editor.addNode(
 				"else-body",
@@ -322,7 +310,7 @@ export default {
 				{},
 				html4
 			);
-			this.editor.updateNodeDataFromId(id4,{nid:"Node id: "+id4})
+			this.editor.updateNodeDataFromId(id4,{nid:"id: "+id4})
 
 			//addConnection(id_output, id_input, output_class, input_class)
 			//this.editor.addConnection(2, 1, "output_1", "input_1");
@@ -333,21 +321,21 @@ export default {
 		createForNode(pos_x, pos_y) {
 			var html = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">For</div>
 						</div>`;
 
 			var html2 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Range</div>
 						</div>`;
 
 			var html3 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Number</div>
 							<div class="item">
@@ -357,7 +345,7 @@ export default {
 
 			var html4 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Number</div>
 							<div class="item">
@@ -367,7 +355,7 @@ export default {
 
 			var html5 = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">For body</div>
 						</div>`;
@@ -384,7 +372,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id1,{nid:"Node id: "+id1})
+			this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1})
 
 			let id2 = this.editor.addNode(
 				"range",
@@ -396,7 +384,7 @@ export default {
 				{},
 				html2
 			);
-			this.editor.updateNodeDataFromId(id2,{nid:"Node id: "+id2})
+			this.editor.updateNodeDataFromId(id2,{nid:"id: "+id2})
 
 			let id3 = this.editor.addNode(
 				"number",
@@ -408,7 +396,7 @@ export default {
 				{},
 				html3
 			);
-			this.editor.updateNodeDataFromId(id3,{nid:"Node id: "+id3, num:"0"})
+			this.editor.updateNodeDataFromId(id3,{nid:"id: "+id3, num:"0"})
 
 			let id4 = this.editor.addNode(
 				"number",
@@ -420,7 +408,7 @@ export default {
 				{},
 				html4
 			);
-			this.editor.updateNodeDataFromId(id4,{nid:"Node id: "+id4, num:"1"})
+			this.editor.updateNodeDataFromId(id4,{nid:"id: "+id4, num:"1"})
 
 			let id5 = this.editor.addNode(
 				"for-body",
@@ -432,7 +420,7 @@ export default {
 				{},
 				html5
 			);
-			this.editor.updateNodeDataFromId(id5,{nid:"Node id: "+id5})
+			this.editor.updateNodeDataFromId(id5,{nid:"id: "+id5})
 
 			//addConnection(id_output, id_input, output_class, input_class)
 			this.editor.addConnection(id2, id1, "output_1", "input_1");
@@ -443,7 +431,7 @@ export default {
 		createPrintNode(pos_x, pos_y) {
 			var html = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Print</div>
 							<div class="item">
@@ -461,12 +449,12 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id1,{nid:"Node id: "+id1, msg:"Hola"})
+			this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1, msg:"Hola"})
 		},
 		createAssignNode(pos_x, pos_y) {
 			var html = `<div class="container">
 							<div class="item">
-								<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+								<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 							</div>
 							<div class="item">Assign</div>
 							<div class="item">
@@ -485,7 +473,7 @@ export default {
 				{},
 				html
 			);
-			this.editor.updateNodeDataFromId(id1,{nid:"Node id: "+id1, assign:""})
+			this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1, assign:""})
 		},
 		createRootNode() {
 			const rootNode = JSON.parse(
@@ -494,7 +482,7 @@ export default {
 			if (rootNode === undefined) {
 				var html = `<div class="container">
 								<div class="item">
-									<strong><input type="text" style="width:100%;" disabled df-nid></strong>
+									<strong><input type="text" style="width:50px;" disabled df-nid></strong>
 								</div>
 								<div class="item">Root</div>
 							</div>`;
@@ -511,10 +499,10 @@ export default {
 					{},
 					html
 				);
-				this.editor.updateNodeDataFromId(id1,{nid:"Node id: "+id1})
+				this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1})
 				this.rootNodeId = id1;
 			} else {
-				this.errors.push({ error: "Ya existe un root node", node: this.rootNodeId });
+				this.showError(`Node id: ${this.rootNodeId}, a root node already exists.`, "error")
 			}
 		},
 		addNodeToDrawFlow(name, pos_x, pos_y) {
