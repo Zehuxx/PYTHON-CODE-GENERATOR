@@ -47,10 +47,9 @@
             </v-btn>
           </v-expansion-panel-content>
         </v-expansion-panel>
+
         <v-expansion-panel>
-          <v-expansion-panel-header class="text-h5"
-            >Program list</v-expansion-panel-header
-          >
+          <v-expansion-panel-header class="text-h5">Program list</v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-data-table
               :headers="headers"
@@ -78,10 +77,9 @@
             </v-data-table>
           </v-expansion-panel-content>
         </v-expansion-panel>
+
         <v-expansion-panel>
-          <v-expansion-panel-header class="text-h5"
-            >Nodes</v-expansion-panel-header
-          >
+          <v-expansion-panel-header class="text-h5">Nodes</v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-simple-table id="programs" height="350px">
               <template v-slot:default>
@@ -137,6 +135,7 @@
         </v-btn>
       </div>
     </v-col>
+
      <v-dialog v-model="dialog" max-width="500px">
       <v-card>
         <v-card-title>
@@ -149,7 +148,7 @@
               <v-col cols="12">
                 <v-form
                   ref="form"
-                  v-model="valid"
+                  v-model="formValid"
                   lazy-validation
                 >
                   <v-text-field
@@ -176,23 +175,17 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
     <v-dialog v-model="dialogDelete" max-width="550px">
       <v-card>
-        <v-card-title class="text-h5"
-          >Are you sure you want to delete this
-          program?</v-card-title
-        >
+        <v-card-title class="text-h5">Are you sure you want to delete this program?</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialogDelete = false"
-            >Cancel</v-btn
-          >
+          <v-btn color="blue darken-1" text @click="dialogDelete = false">Cancel</v-btn>
           <v-btn
             color="blue darken-1"
             text
-            @click="deleteItemConfirm"
-            >OK</v-btn
-          >
+            @click="deleteItemConfirm">OK</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
@@ -218,7 +211,7 @@ export default {
       error: "",
       typeError: "error",
       panel: [0, 1, 2],
-      valid: true,
+      formValid: true,
       programName: "",
       editing: false,
       uidEditing: "",
@@ -261,9 +254,17 @@ export default {
     this.getPrograms();
   },
   methods: {
+    async getPrograms() {
+      let res = await api.getPrograms()
+      if(res.status == 200){
+        this.programs = res.data;
+      }else{
+        this.showError(res.msg, "error")
+      }
+    },
     async saveProgramConfirm() {
-      this.valid = this.$refs.form.validate();
-      if(this.valid){
+      this.formValid = this.$refs.form.validate();
+      if(this.formValid){
         
         var exportdata = this.editor.export();
         let data = JSON.parse(JSON.stringify(exportdata.drawflow.Home.data));
@@ -282,7 +283,10 @@ export default {
             this.editor.clear()
             this.editor.nodeId = 1
             this.rootNodeId = 0
-            this.$refs.form.reset();
+            this.programName = ""
+            this.script = ""
+            this.validation = {}
+            this.errors = []
             this.dialog = false
             this.getPrograms()
           }else{
@@ -295,7 +299,10 @@ export default {
             this.editor.clear()
             this.rootNodeId = 0
             this.editor.nodeId = 1
-            this.$refs.form.reset();
+            this.programName = ""
+            this.script = ""
+            this.validation = {}
+            this.errors = []
             this.dialog = false
             this.getPrograms()
           }else{
@@ -309,10 +316,14 @@ export default {
       if(res.status == 204){
         if(this.uidDeleting == this.uidEditing){
           this.uidEditing = ""
+          this.editing = false
           this.editor.clear()
           this.editor.nodeId = 1
           this.rootNodeId = 0
-          this.$refs.form.reset();
+          this.programName = ""
+          this.script = ""
+          this.validation = {}
+          this.errors = []
         }
         
         this.programs = this.programs.filter(p => p.uid !== this.uidDeleting)
@@ -343,27 +354,6 @@ export default {
       this.typeError = type
       this.alert = true
     },
-    allowDrop(ev) {
-      ev.preventDefault();
-    },
-    drag(ev) {
-      ev.dataTransfer.setData("node", ev.target.getAttribute("data-node"));
-    },
-    drop(ev) {
-      ev.preventDefault();
-      let data = ev.dataTransfer.getData("node");
-      let pos_x =
-        ((ev.clientX - this.editor.precanvas.getBoundingClientRect().left) /
-          (this.editor.precanvas.getBoundingClientRect().right -
-            this.editor.precanvas.getBoundingClientRect().left)) *
-        this.editor.precanvas.clientWidth;
-      let pos_y =
-        ((ev.clientY - this.editor.precanvas.getBoundingClientRect().top) /
-          (this.editor.precanvas.getBoundingClientRect().bottom -
-            this.editor.precanvas.getBoundingClientRect().top)) *
-        this.editor.precanvas.clientHeight;
-      this.addNodeToDrawFlow(data, pos_x, pos_y);
-    },
     prepareDrawflowData(nodes) {
       let json = {};
       for (let i in nodes) {
@@ -389,10 +379,6 @@ export default {
         }else{
           console.log(res);
         }
-    },
-    async getPrograms() {
-      let {data} = await api.getPrograms()
-      this.programs = data;
     },
   },
   mixins: [create, validations],

@@ -494,7 +494,7 @@ export default {
 					1,
 					0,
 					pos_x,
-					pos_y,
+					pos_y, 
 					"node-root",
 					{},
 					html
@@ -504,6 +504,25 @@ export default {
 			} else {
 				this.showError(`Node id: ${this.rootNodeId}, a root node already exists.`, "error")
 			}
+		},
+		allowDrop(ev) {
+			ev.preventDefault();
+		},
+		drag(ev) {
+		ev.dataTransfer.setData("node", ev.target.getAttribute("data-node"));
+		},
+		drop(ev) {
+			ev.preventDefault();
+			let data = ev.dataTransfer.getData("node");
+			let pos_x = ((ev.clientX - this.editor.precanvas.getBoundingClientRect().left) /
+				(this.editor.precanvas.getBoundingClientRect().right -
+					this.editor.precanvas.getBoundingClientRect().left)) *
+				this.editor.precanvas.clientWidth;
+			let pos_y =	((ev.clientY - this.editor.precanvas.getBoundingClientRect().top) /
+				(this.editor.precanvas.getBoundingClientRect().bottom -
+					this.editor.precanvas.getBoundingClientRect().top)) *
+				this.editor.precanvas.clientHeight;
+			this.addNodeToDrawFlow(data, pos_x, pos_y);
 		},
 		addNodeToDrawFlow(name, pos_x, pos_y) {
 			switch (name) {
