@@ -3,5 +3,13 @@
     "clean_urls": true,
     "routes": {
       "/**": "index.html"
+    },
+    "proxies": {
+      "/v1": {
+        "origin": "https://api.jdoodle.com/"
+      },
+      "/api": {
+        "origin": "https://${BACKEND_URL}/api"
+      }
     }
   }
