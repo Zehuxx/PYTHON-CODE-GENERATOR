@@ -7,7 +7,7 @@ let getPrograms = () => {
         return { status: error.response?.status, msg: error.response?.data.Msg }
     });
 }
- 
+  
 let getProgramsByUid = (uid) => {
     return programsApi.get(`/${uid}/`).then((result) => {
         return { status: result?.status, data: result?.data.programs[0] }

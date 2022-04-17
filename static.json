@@ -9,7 +9,7 @@
         "origin": "https://api.jdoodle.com/"
       },
       "/api": {
-        "origin": "https://${BACKEND_URL}/api/programs"
+        "origin": "https://drawflowapi.herokuapp.com/api/programs"
       }
     }
   }
