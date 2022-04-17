@@ -12,6 +12,6 @@ module.exports = defineConfig({
             target: 'http://localhost:3000/'
           }
     }
-}
+} 
 })
 
