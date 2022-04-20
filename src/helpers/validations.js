@@ -559,7 +559,7 @@ export default {
                 this.selectValidation(node, 0);
               });
             } else {
-              this.showError('You must add a root node.', "error")
+              this.showAlert("error", 'You must add a root node.')
             }
           },
           selectValidation(node, identation){

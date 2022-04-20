@@ -502,7 +502,7 @@ export default {
 				this.editor.updateNodeDataFromId(id1,{nid:"id: "+id1})
 				this.rootNodeId = id1;
 			} else {
-				this.showError(`Node id: ${this.rootNodeId}, a root node already exists.`, "error")
+				this.showAlert("error",`Node id: ${this.rootNodeId}, a root node already exists.`)
 			}
 		},
 		allowDrop(ev) {

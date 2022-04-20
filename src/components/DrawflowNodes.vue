@@ -1,18 +1,5 @@
 <template>
-
   <v-row>
-    <v-col cols="12" v-if="alert">
-      <v-alert
-        dense
-        text
-        v-model="alert"
-        :type="typeError"
-        dismissible
-        style="margin-bottom: 0px;"
-      >
-        {{error}}
-      </v-alert>
-    </v-col>
     <v-col xs="12" sm="12" md="4" cols="12">
       <v-expansion-panels accordion v-model="panel" multiple>
         <v-expansion-panel>
@@ -77,50 +64,46 @@
             </v-data-table>
           </v-expansion-panel-content>
         </v-expansion-panel>
-
-        <v-expansion-panel>
-          <v-expansion-panel-header class="text-h5">Nodes</v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-simple-table id="programs" height="350px">
-              <template v-slot:default>
-                <tbody>
-                  <tr draggable="true" v-on:dragstart="drag" data-node="root">
-                    <td>Root</td>
-                  </tr>
-                  <tr draggable="true" v-on:dragstart="drag" data-node="print">
-                    <td>Print</td>
-                  </tr>
-                  <tr draggable="true" v-on:dragstart="drag" data-node="for">
-                    <td>Block for</td>
-                  </tr>
-                  <tr draggable="true" v-on:dragstart="drag" data-node="if">
-                    <td>Block if</td>
-                  </tr>
-                  <tr draggable="true" v-on:dragstart="drag" data-node="assign">
-                    <td>Assign</td>
-                  </tr>
-                  <tr draggable="true" v-on:dragstart="drag" data-node="add">
-                    <td>Add</td>
-                  </tr>
-                  <tr draggable="true" v-on:dragstart="drag" data-node="sub">
-                    <td>Sub</td>
-                  </tr>
-                  <tr draggable="true" v-on:dragstart="drag" data-node="mul">
-                    <td>Mul</td>
-                  </tr>
-                  <tr draggable="true" v-on:dragstart="drag" data-node="div">
-                    <td>Div</td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
       </v-expansion-panels>
     </v-col>
 
     <v-col xs="12" sm="12" md="8" cols="12">
       <div id="drawflow" v-on:drop="drop" v-on:dragover="allowDrop">
+        <div class="text-center">
+          <v-menu
+            open-on-hover
+            top
+            offset-y
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                style="z-index: 4;"
+                color="warning"
+                class="mb-1 mr-12 accent-2"
+                bottom
+                right
+                small
+                absolute
+                dark
+                v-bind="attrs"
+                v-on="on"
+              >
+                Add nodes
+              </v-btn>
+            </template>
+
+            <v-list>
+              <v-list-item v-for="node in nodes" :key="node.id" 
+                dense
+                draggable="true"
+                v-on:dragstart="drag"
+                :data-node="node.id"
+              >
+                <v-list-item-title >{{node.name}}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </div>
         <v-btn
           class="mb-10"
           fab
@@ -136,12 +119,11 @@
       </div>
     </v-col>
 
-     <v-dialog v-model="dialog" max-width="500px">
+    <v-dialog v-model="dialog" max-width="500px">
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ formTitle }}</span>
         </v-card-title>
-
         <v-card-text>
           <v-container>
             <v-row>
@@ -154,8 +136,8 @@
                   <v-text-field
                     v-model="programName"
                     label="Program name"
-                    :rules="[v => !!v || 'Program name is required',
-                             v => v && !!v.trim() || 'Program name is required']"
+                    :rules="[v => !!v || 'Program name is required.',
+                             v => v && !!v.trim() || 'Program name is required.']"
                     required
                   ></v-text-field>
                 </v-form>
@@ -163,7 +145,6 @@
             </v-row>
           </v-container>
         </v-card-text>
-
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="dialog = false">
@@ -190,6 +171,37 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialogAlerts" max-width="400px">
+      <v-card>
+        <v-card-text class="py-10">
+          <v-container>
+            <v-row>
+              <v-col cols="12" class="text-center text-h6" v-if="!alert">
+                {{alertTitle}}
+                <v-progress-linear
+                  color="success accent-4"
+                  indeterminate
+                  rounded
+                  height="6"
+                ></v-progress-linear>
+              </v-col>
+              <v-col cols="12" v-if="alert" >
+                <v-alert
+                  dense
+                  text
+                  v-model="alert"
+                  :type="typeAlert"
+                  style="margin-bottom: 0px;"
+                >
+                  {{alertMsg}}
+                </v-alert>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-row>
 </template>
 
@@ -207,10 +219,12 @@ import validations from "../helpers/validations";
 export default {
   data() {
     return {
+      dialogAlerts: false,
+      alertTitle: "",
       alert: false,
-      error: "",
-      typeError: "error",
-      panel: [0, 1, 2],
+      alertMsg: "",
+      typeAlert: "error",
+      panel: [0, 1],
       formValid: true,
       programName: "",
       editing: false,
@@ -219,7 +233,6 @@ export default {
       dialog: false,
       dialogDelete: false,
       editor: null,
-      exportdata: null,
       script: "",
       rootNodeId: 0,
       errors: [],
@@ -239,6 +252,17 @@ export default {
           value: "uid",
           class: "text-h6"
         },
+      ],
+      nodes:[
+        {id:"root", name: "Root"},
+        {id:"print", name: "Print"},
+        {id:"for", name: "Block for"},
+        {id:"if", name: "Block if"},
+        {id:"assign", name: "Assign"},
+        {id:"add", name: "Add"},
+        {id:"sub", name: "Sub"},
+        {id:"mul", name: "Mul"},
+        {id:"div", name: "Div"},
       ]
     };
   },
@@ -259,13 +283,12 @@ export default {
       if(res.status == 200){
         this.programs = res.data;
       }else{
-        this.showError(res.msg, "error")
+        this.showAlert("error", res.msg)
       }
     },
     async saveProgramConfirm() {
       this.formValid = this.$refs.form.validate();
       if(this.formValid){
-        
         var exportdata = this.editor.export();
         let data = JSON.parse(JSON.stringify(exportdata.drawflow.Home.data));
 
@@ -275,6 +298,7 @@ export default {
         }
 
         if(this.editing){//update program
+          this.showAlert("updating")
           let program = { programName: this.programName, nodes: values, uid: this.uidEditing};
           let res = await api.updateProgram(this.uidEditing, program)
           if(res.status == 204){
@@ -289,10 +313,12 @@ export default {
             this.errors = []
             this.dialog = false
             this.getPrograms()
+            this.showAlert("success", "The program was successfully updated.")
           }else{
-            this.showError(res.msg, "error")
+            this.showAlert("error", res.msg)
           }
         }else{//create program
+          this.showAlert("saving")
           let program = { programName: this.programName, nodes: values, uid: "_:program" };
           let res = await api.saveProgram(program)
           if(res.status == 201){
@@ -305,13 +331,16 @@ export default {
             this.errors = []
             this.dialog = false
             this.getPrograms()
+            this.showAlert("success", "The program was saved successfully.")
           }else{
-            this.showError(res.msg, "error")
+            this.showAlert("error", res.msg)
           }
         }
       }
     },
     async deleteItemConfirm() {
+      this.dialogDelete = false
+      this.showAlert("deleting")
       let res = await api.deleteProgram(this.uidDeleting)
       if(res.status == 204){
         if(this.uidDeleting == this.uidEditing){
@@ -328,16 +357,17 @@ export default {
         
         this.programs = this.programs.filter(p => p.uid !== this.uidDeleting)
         this.uidDeleting = ""
+        this.showAlert("success", "The program was successfully deleted.")
       }else{
-        this.showError(res.msg, "error")
+        this.showAlert("error", res.msg)
       }
-      this.dialogDelete = false
     },
     deleteItem(uid) {
       this.uidDeleting = uid
       this.dialogDelete = true;
     },
     async editItem(uid) {
+      this.showAlert("loading")
       let res = await api.getProgramsByUid(uid)
       if(res.status == 200){
         this.editor.clear()
@@ -345,14 +375,37 @@ export default {
         this.editor.import(this.prepareDrawflowData(res.data.nodes))
         this.editing = true
         this.uidEditing = uid
+        this.dialogAlerts = false
       }else{
-        this.showError(res.msg, "error")
+        this.showAlert("error",res.msg)
       }
     },
-     showError(error, type){
-      this.error = error
-      this.typeError = type
-      this.alert = true
+    showAlert(action, msg=""){
+      switch (action) {
+        case "loading":
+          this.alertTitle = "Loading..."
+        break
+        case "saving":
+          this.alertTitle = "Saving..."
+        break
+        case "updating":
+          this.alertTitle = "Updating..."
+        break
+        case "deleting":
+          this.alertTitle = "Deleting..."
+        break
+        case "success":
+          this.typeAlert = "success"
+          this.alertMsg = msg
+          this.alert = true
+        break
+        default:
+          this.typeAlert = "error"
+          this.alertMsg = msg
+          this.alert = true
+        break
+      }
+      this.dialogAlerts = true
     },
     prepareDrawflowData(nodes) {
       let json = {};
@@ -406,4 +459,8 @@ export default {
   min-height: 70px !important;
 }
 
+.theme--light.v-list-item:hover{
+  background-color: rgb(246 246 246) !important;
+  cursor: pointer !important;
+}
 </style>
