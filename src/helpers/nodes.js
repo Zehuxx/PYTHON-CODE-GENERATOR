@@ -509,7 +509,8 @@ export default {
 			ev.preventDefault();
 		},
 		drag(ev) {
-		ev.dataTransfer.setData("node", ev.target.getAttribute("data-node"));
+			ev.dataTransfer.setDragImage(new Image, 0, 0);
+			ev.dataTransfer.setData("node", ev.target.getAttribute("data-node"));
 		},
 		drop(ev) {
 			ev.preventDefault();

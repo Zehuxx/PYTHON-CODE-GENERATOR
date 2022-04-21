@@ -95,6 +95,7 @@
             <v-list>
               <v-list-item v-for="node in nodes" :key="node.id" 
                 dense
+                @click="addNodeToDrawFlow(node.id,(editor.precanvas.clientWidth*1/4),(editor.precanvas.clientHeight/2))"
                 draggable="true"
                 v-on:dragstart="drag"
                 :data-node="node.id"
