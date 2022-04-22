@@ -68,7 +68,7 @@
     </v-col>
 
     <v-col xs="12" sm="12" md="8" cols="12">
-      <div id="drawflow" v-on:drop="drop" v-on:dragover="allowDrop">
+      <div id="drawflow" v-on:drop="drop" v-on:dragover="allowDrop" :style="height">
         <div class="text-center">
           <v-menu
             open-on-hover
@@ -271,6 +271,13 @@ export default {
     formTitle() {
       return this.editing ? "Edit program":"New program";
     },
+    height() {
+        switch (this.$vuetify.breakpoint.name) {
+          case 'xs': return "height: 80vh;"
+          case 'sm': return "height: 80vh;"
+          default: return "height: calc(100vh - 24px);"
+        }
+      }
   },
   mounted() {
     const id = document.getElementById("drawflow");
@@ -444,7 +451,6 @@ export default {
   text-align: initial;
   position: relative;
   width: 100%;
-  height: calc(100vh - 24px);
 }
 
 #programs tbody tr {
@@ -457,7 +463,7 @@ export default {
 }
 
 .v-expansion-panel-header {
-  min-height: 70px !important;
+  min-height: 50px !important;
 }
 
 .theme--light.v-list-item:hover{
