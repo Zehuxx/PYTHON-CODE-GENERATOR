@@ -344,7 +344,7 @@ export default {
             this.showAlert("error", res.msg)
           }
         }
-      }
+      } 
     },
     async deleteItemConfirm() {
       this.dialogDelete = false

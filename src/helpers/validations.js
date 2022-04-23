@@ -176,7 +176,7 @@ export default {
                       node: nodeInput.id
                     });
                   }
-                }
+                } 
 
                 this.script = this.script.replace('{condition}', nodeInput.data.con.trim())
               } else {
@@ -202,26 +202,27 @@ export default {
               if (nodeIfBody.name === "if-body") {
                 //INPUTS
                 let input_connections = nodeIfBody.inputs.input_1.connections.length;
-                if (input_connections === 1) {
-                  let nodeInput = this.editor.getNodeFromId(
-                    nodeIfBody.inputs.input_1.connections[0].node
-                  );
-                  if (
-                    nodeInput.name === "assign" ||
-                    nodeInput.name === "for" ||
-                    nodeInput.name === "if" ||
-                    nodeInput.name === "print"
-                  ) {
-                    this.selectValidation(nodeInput, identation+1);
-                  } else {
-                    this.errors.push({
-                      error: "[input_1] the " + nodeInput.name + " node is not allowed.",
-                      node: nodeIfBody.id
-                    });
-                  }
+                if (input_connections !== 0) {
+                  let connections = nodeIfBody.inputs.input_1.connections
+                  connections.forEach((connection) => {
+                      let nodeInput = this.editor.getNodeFromId(connection.node);
+                      if (
+                        nodeInput.name === "assign" ||
+                        nodeInput.name === "for" ||
+                        nodeInput.name === "if" ||
+                        nodeInput.name === "print"
+                      ) {
+                        this.selectValidation(nodeInput, identation+4);
+                      } else {
+                        this.errors.push({
+                          error: "[input_1] the " + nodeInput.name + " node is not allowed.",
+                          node: nodeIfBody.id
+                        });
+                      }
+                  });
                 } else {
                   this.errors.push({
-                    error: "[input_1] requires only 1 connection.",
+                    error: "[input_1] requires at least 1 connection.",
                     node: nodeIfBody.id
                   });
                 }
@@ -267,28 +268,28 @@ export default {
               if (nodeElseBody.name === "else-body") {
                 this.script += this.returnIdentation(identation) + "else:\n";
                 //INPUTS
-                let input_connections =
-                  nodeElseBody.inputs.input_1.connections.length;
-                if (input_connections === 1) {
-                  let nodeInput = this.editor.getNodeFromId(
-                    nodeElseBody.inputs.input_1.connections[0].node
-                  );
-                  if (
-                    nodeInput.name === "assign" ||
-                    nodeInput.name === "for" ||
-                    nodeInput.name === "if" ||
-                    nodeInput.name === "print"
-                  ) {
-                    this.selectValidation(nodeInput,identation+1);
-                  } else {
-                    this.errors.push({
-                      error: "[input_1] the " + nodeInput.name + " node is not allowed.",
-                      node: nodeElseBody.id
-                    });
-                  }
+                let input_connections = nodeElseBody.inputs.input_1.connections.length;
+                if (input_connections != 0) {
+                  let connections = nodeElseBody.inputs.input_1.connections
+                  connections.forEach((connection) => {
+                      let nodeInput = this.editor.getNodeFromId(connection.node);
+                      if (
+                        nodeInput.name === "assign" ||
+                        nodeInput.name === "for" ||
+                        nodeInput.name === "if" ||
+                        nodeInput.name === "print"
+                      ) {
+                        this.selectValidation(nodeInput,identation+4);
+                      } else {
+                        this.errors.push({
+                          error: "[input_1] the " + nodeInput.name + " node is not allowed.",
+                          node: nodeElseBody.id
+                        });
+                      }
+                  });
                 } else {
                   this.errors.push({
-                    error: "[input_1] requires only 1 connection.",
+                    error: "[input_1] requires at least 1 connection.",
                     node: nodeElseBody.id
                   });
                 }
@@ -360,12 +361,15 @@ export default {
                   nodeInput.name === "else-body" ||
                   nodeInput.name === "for-body" ||
                   nodeInput.name === "root") {
+
                     let c= node.data.msg
-                    if(c.substring(0,1) == "{" && c.substring(c.length - 1) == "}"){
-                      this.script += this.returnIdentation(identation) + `print(${c.substring(1,c.length-1)})\n`;
-                    }else{
-                      this.script += this.returnIdentation(identation) + "print('"+c+"')\n";
+                    // eslint-disable-next-line
+                    const variables = [...c.matchAll(/\{([^{}]+)\}/g)]
+                    for(var i = 0; i < variables.length; i++) {
+                      c = c.replace(variables[i]["0"],"\","+variables[i]["1"]+",\"")
                     }
+                    this.script += this.returnIdentation(identation) + "print(\""+c+"\")\n";
+
               } else {
                 this.errors.push({
                   error: "[output_1] the " + nodeInput.name + " node is not allowed.",
@@ -473,26 +477,27 @@ export default {
               if (nodeForBody.name === "for-body") {
                 //INPUTS
                 let input_connections = nodeForBody.inputs.input_1.connections.length;
-                if (input_connections === 1) {
-                  let nodeInput = this.editor.getNodeFromId(
-                    nodeForBody.inputs.input_1.connections[0].node
-                  );
-                  if (
-                    nodeInput.name === "assign" ||
-                    nodeInput.name === "for" ||
-                    nodeInput.name === "if" ||
-                    nodeInput.name === "print"
-                  ) {
-                    this.selectValidation(nodeInput, identation+1);
-                  } else {
-                    this.errors.push({
-                      error: "[input_1] the " + nodeInput.name + " node is not allowed.",
-                      node: nodeForBody.id
-                    });
-                  }
+                if (input_connections != 0 ) {
+                  let connections = nodeForBody.inputs.input_1.connections;
+                  connections.forEach((connection) => {
+                      let nodeInput = this.editor.getNodeFromId(connection.node);
+                      if (
+                        nodeInput.name === "assign" ||
+                        nodeInput.name === "for" ||
+                        nodeInput.name === "if" ||
+                        nodeInput.name === "print"
+                      ) {
+                        this.selectValidation(nodeInput, identation+4);
+                      } else {
+                        this.errors.push({
+                          error: "[input_1] the " + nodeInput.name + " node is not allowed.",
+                          node: nodeForBody.id
+                        });
+                      }
+                  });
                 } else {
                   this.errors.push({
-                    error: "[input_1] requires only 1 connection.",
+                    error: "[input_1] requires at least 1 connection.",
                     node: nodeForBody.id
                   });
                 }
