@@ -29,8 +29,11 @@
             <v-btn color="cyan" @click="validateRoot" class="mr-2 mb-2">
               evaluate code
             </v-btn>
-            <v-btn color="success" @click="executeCode" class="mb-2">
+            <v-btn color="success" @click="executeCode" class="mr-2 mb-2">
               run code
+            </v-btn>
+            <v-btn color="error" @click="resetEditor" class="mb-2">
+              reset editor
             </v-btn>
           </v-expansion-panel-content>
         </v-expansion-panel>
@@ -310,15 +313,7 @@ export default {
           let program = { programName: this.programName, nodes: values, uid: this.uidEditing};
           let res = await api.updateProgram(this.uidEditing, program)
           if(res.status == 204){
-            this.editing = false
-            this.uidEditing = ""
-            this.editor.clear()
-            this.editor.nodeId = 1
-            this.rootNodeId = 0
-            this.programName = ""
-            this.script = ""
-            this.validation = {}
-            this.errors = []
+            this.resetEditor()
             this.dialog = false
             this.getPrograms()
             this.showAlert("success", "The program was successfully updated.")
@@ -330,13 +325,7 @@ export default {
           let program = { programName: this.programName, nodes: values, uid: "_:program" };
           let res = await api.saveProgram(program)
           if(res.status == 201){
-            this.editor.clear()
-            this.rootNodeId = 0
-            this.editor.nodeId = 1
-            this.programName = ""
-            this.script = ""
-            this.validation = {}
-            this.errors = []
+            this.resetEditor()
             this.dialog = false
             this.getPrograms()
             this.showAlert("success", "The program was saved successfully.")
@@ -352,15 +341,7 @@ export default {
       let res = await api.deleteProgram(this.uidDeleting)
       if(res.status == 204){
         if(this.uidDeleting == this.uidEditing){
-          this.uidEditing = ""
-          this.editing = false
-          this.editor.clear()
-          this.editor.nodeId = 1
-          this.rootNodeId = 0
-          this.programName = ""
-          this.script = ""
-          this.validation = {}
-          this.errors = []
+          this.resetEditor()
         }
         
         this.programs = this.programs.filter(p => p.uid !== this.uidDeleting)
@@ -378,7 +359,7 @@ export default {
       this.showAlert("loading")
       let res = await api.getProgramsByUid(uid)
       if(res.status == 200){
-        this.editor.clear()
+        this.resetEditor()
         this.programName = res.data.programName
         this.editor.import(this.prepareDrawflowData(res.data.nodes))
         this.editing = true
@@ -441,6 +422,19 @@ export default {
           console.log(res);
         }
     },
+    resetEditor(){
+      this.uidEditing = ""
+      this.editing = false
+      this.editor.clear()
+      this.editor.nodeId = 1
+      this.rootNodeId = 0
+      if (this.$refs['form']) {
+        this.$refs.form.reset();
+      }
+      this.script = ""
+      this.validation = {}
+      this.errors = []
+    }
   },
   mixins: [create, validations],
 };

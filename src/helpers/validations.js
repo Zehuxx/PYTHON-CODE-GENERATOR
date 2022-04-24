@@ -363,8 +363,7 @@ export default {
                   nodeInput.name === "root") {
 
                     let c= node.data.msg
-                    // eslint-disable-next-line
-                    const variables = [...c.matchAll(/\{([^{}]+)\}/g)]
+                    const variables = [...c.matchAll(/\{([^{}]+)\}/g)]// busca variables {var} {var2}
                     for(var i = 0; i < variables.length; i++) {
                       c = c.replace(variables[i]["0"],"\","+variables[i]["1"]+",\"")
                     }
