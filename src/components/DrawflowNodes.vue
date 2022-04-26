@@ -1,7 +1,9 @@
 <template>
   <v-row>
     <v-col xs="12" sm="12" md="4" cols="12">
+
       <v-expansion-panels accordion v-model="panel" multiple>
+
         <v-expansion-panel>
           <v-expansion-panel-header class="text-h5">Code</v-expansion-panel-header>
           <v-expansion-panel-content>
@@ -67,6 +69,7 @@
             </v-data-table>
           </v-expansion-panel-content>
         </v-expansion-panel>
+
       </v-expansion-panels>
     </v-col>
 
@@ -128,6 +131,7 @@
         <v-card-title>
           <span class="text-h5">{{ formTitle }}</span>
         </v-card-title>
+        
         <v-card-text>
           <v-container>
             <v-row>
@@ -149,6 +153,7 @@
             </v-row>
           </v-container>
         </v-card-text>
+
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="dialog = false">
@@ -158,6 +163,7 @@
             Save
           </v-btn>
         </v-card-actions>
+
       </v-card>
     </v-dialog>
 
@@ -206,6 +212,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
   </v-row>
 </template>
 
@@ -314,9 +321,11 @@ export default {
           let res = await api.updateProgram(this.uidEditing, program)
           if(res.status == 204){
             this.resetEditor()
-            this.dialog = false
-            this.getPrograms()
-            this.showAlert("success", "The program was successfully updated.")
+            this.$nextTick(()=>{
+              this.dialog = false
+              this.getPrograms()
+              this.showAlert("success", "The program was successfully updated.")
+            })
           }else{
             this.showAlert("error", res.msg)
           }
@@ -326,9 +335,11 @@ export default {
           let res = await api.saveProgram(program)
           if(res.status == 201){
             this.resetEditor()
-            this.dialog = false
-            this.getPrograms()
-            this.showAlert("success", "The program was saved successfully.")
+            this.$nextTick(()=>{
+              this.dialog = false
+              this.getPrograms()
+              this.showAlert("success", "The program was saved successfully.")
+            })
           }else{
             this.showAlert("error", res.msg)
           }
@@ -343,7 +354,6 @@ export default {
         if(this.uidDeleting == this.uidEditing){
           this.resetEditor()
         }
-        
         this.programs = this.programs.filter(p => p.uid !== this.uidDeleting)
         this.uidDeleting = ""
         this.showAlert("success", "The program was successfully deleted.")
@@ -360,16 +370,19 @@ export default {
       let res = await api.getProgramsByUid(uid)
       if(res.status == 200){
         this.resetEditor()
-        this.programName = res.data.programName
-        this.editor.import(this.prepareDrawflowData(res.data.nodes))
-        this.editing = true
-        this.uidEditing = uid
-        this.dialogAlerts = false
+        this.$nextTick(()=>{
+          this.programName = res.data.programName
+          this.editor.import(this.prepareDrawflowData(res.data.nodes))
+          this.editing = true
+          this.uidEditing = uid
+          this.showAlert("success", "The program was successfully loaded.")
+        })
       }else{
         this.showAlert("error",res.msg)
       }
     },
     showAlert(action, msg=""){
+      this.alert = false
       switch (action) {
         case "loading":
           this.alertTitle = "Loading..."
@@ -386,12 +399,13 @@ export default {
         case "success":
           this.typeAlert = "success"
           this.alertMsg = msg
-          this.alert = true
+          setTimeout(()=>{ this.alert = true},1000)
         break
         default:
           this.typeAlert = "error"
           this.alertMsg = msg
           this.alert = true
+          setTimeout(()=>{ this.alert = true},1000)
         break
       }
       this.dialogAlerts = true
